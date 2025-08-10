@@ -27,7 +27,7 @@ export async function uploadImageToS3(file: File, folder = "products"): Promise<
   let finalBuffer = originalBuffer
 
   // If file is larger than 1MB, compress it
-  const ONE_MB = 1 * 1024 * 1024
+  const ONE_MB = 0.5 * 1024 * 1024
   if (file.size > ONE_MB) {
     try {
       // Compress using sharp
