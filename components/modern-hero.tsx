@@ -55,7 +55,7 @@ export function ModernHero() {
       setVideoLoaded(true)
       globalVideoLoaded = true
       globalVideoCache = video
-      
+
       // Auto-play with error handling
       const playPromise = video.play()
       if (playPromise !== undefined) {
@@ -82,7 +82,7 @@ export function ModernHero() {
       video.addEventListener("canplay", handleCanPlay)
       video.addEventListener("error", handleError)
       video.addEventListener("loadeddata", handleLoadedData)
-      
+
       // REMOVED: video.load() - This was causing re-downloads!
       // The browser will automatically load based on preload attribute
     } else {
@@ -185,8 +185,8 @@ export function ModernHero() {
           transition: "opacity 0.5s ease-in-out",
         }}
       >
-        <source src="/herox.mp4" type="video/mp4" />
-        <source src="/herox.webm" type="video/webm" />
+        <source src="/hero69.mp4" type="video/mp4" />
+        <source src="/hero69.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
 
@@ -227,7 +227,7 @@ export function ModernHero() {
             fontWeight: "800",
             lineHeight: "1.1",
             margin: 0,
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Playfair Display', serif", // Changed font
             textTransform: "uppercase",
             letterSpacing: "-0.03em",
             opacity: showText ? 1 : 0,
@@ -236,7 +236,7 @@ export function ModernHero() {
             transitionDelay: "0.2s",
           }}
         >
-          Luxury <br /> Clothes
+          Classique <br /> Signore
         </h1>
         <div
           style={{
@@ -256,28 +256,32 @@ export function ModernHero() {
           <button
             onClick={handleShopClick}
             style={{
-              backgroundColor: "white",
-              color: "black",
-              border: "none",
-              padding: "18px 40px",
+              backgroundColor: "transparent", // Changed to transparent
+              color: "white", // Changed text color to white
+              border: "2px solid white", // Added white border
+              padding: "16px 40px",
               fontSize: "18px",
-              fontWeight: "700",
-              borderRadius: "0",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
+              fontWeight: "600",
+              borderRadius: "9999px",
+              textTransform: "none",
+              letterSpacing: "normal",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
               width: isMobile ? "80%" : "auto",
               maxWidth: "300px",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "rgba(42, 85, 90, 0.8)"
-              e.currentTarget.style.transform = "scale(1.05)"
+              e.currentTarget.style.backgroundColor = "white" // White on hover
+              e.currentTarget.style.color = "#1f2937" // Dark text on hover
+              e.currentTarget.style.transform = "scale(1.02)"
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.15)"
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "white"
+              e.currentTarget.style.backgroundColor = "transparent" // Transparent on leave
+              e.currentTarget.style.color = "white" // White text on leave
               e.currentTarget.style.transform = "scale(1)"
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)"
             }}
           >
             Acheter Maintenant
@@ -288,28 +292,31 @@ export function ModernHero() {
           >
             <button
               style={{
-                backgroundColor: "transparent",
-                color: "white",
-                border: "2px solid white",
-                padding: "18px 40px",
+                backgroundColor: "transparent", // Changed to transparent
+                color: "white", // Changed text color to white
+                border: "2px solid white", // Added white border
+                padding: "16px 40px",
                 fontSize: "18px",
-                fontWeight: "700",
-                borderRadius: "0",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
+                fontWeight: "600",
+                borderRadius: "9999px",
+                textTransform: "none",
+                letterSpacing: "normal",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                 width: "100%",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "white"
-                e.currentTarget.style.color = "black"
-                e.currentTarget.style.transform = "scale(1.05)"
+                e.currentTarget.style.backgroundColor = "white" // White on hover
+                e.currentTarget.style.color = "#1f2937" // Dark text on hover
+                e.currentTarget.style.transform = "scale(1.02)"
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.15)"
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent"
-                e.currentTarget.style.color = "white"
+                e.currentTarget.style.backgroundColor = "transparent" // Transparent on leave
+                e.currentTarget.style.color = "white" // White text on leave
                 e.currentTarget.style.transform = "scale(1)"
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)"
               }}
             >
               Nous Contacter

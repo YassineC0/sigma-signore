@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useAdminAuth } from "@/contexts/AdminAuthContext"
-import { Plus, Edit, Trash2, LogOut, FolderPlus, X } from 'lucide-react'
+import { Plus, Edit, Trash2, LogOut, FolderPlus, X, Minus } from 'lucide-react'
 import Image from "next/image"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { ToggleSwitch } from "@/components/admin/toggle-switch"
@@ -272,9 +272,21 @@ export default function AdminDashboard() {
   const updateVariantStock = (color: string | undefined, size: string, stock: number) => {
     setVariants(prev => prev.map(variant => 
       variant.color === color && variant.size === size
-        ? { ...variant, stock_quantity: stock }
+        ? { ...variant, stock_quantity: Math.max(0, stock) }
         : variant
     ))
+  }
+
+  const incrementStock = (color: string | undefined, size: string) => {
+    const variant = variants.find(v => v.color === color && v.size === size)
+    const currentStock = variant?.stock_quantity || 0
+    updateVariantStock(color, size, currentStock + 1)
+  }
+
+  const decrementStock = (color: string | undefined, size: string) => {
+    const variant = variants.find(v => v.color === color && v.size === size)
+    const currentStock = variant?.stock_quantity || 0
+    updateVariantStock(color, size, Math.max(0, currentStock - 1))
   }
 
   const handleSubmitProduct = async (e: React.FormEvent) => {
@@ -387,66 +399,70 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", padding: "20px" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", padding: "10px" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Header */}
+        {/* Header - Mobile Optimized */}
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "30px",
+            flexDirection: "column",
+            gap: "15px",
+            marginBottom: "20px",
             backgroundColor: "white",
-            padding: "20px",
+            padding: "15px",
             borderRadius: "8px",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#1f2937", margin: 0 }}>
-            Tableau de bord Admin
-          </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span style={{ color: "#6b7280" }}>Bienvenue, {user?.username}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1f2937", margin: 0 }}>
+              Admin
+            </h1>
             <button
               onClick={logout}
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "6px",
                 backgroundColor: "#ef4444",
                 color: "white",
                 border: "none",
-                padding: "8px 16px",
+                padding: "8px 12px",
                 borderRadius: "6px",
                 cursor: "pointer",
-                fontSize: "14px",
+                fontSize: "12px",
               }}
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
               Déconnexion
             </button>
           </div>
+          <div style={{ fontSize: "14px", color: "#6b7280" }}>
+            Bienvenue, {user?.username}
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: "flex", gap: "15px", marginBottom: "30px" }}>
+        {/* Action Buttons - Mobile Optimized */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
           <button
             onClick={() => { setShowProductForm(true); resetProductForm(); }}
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "8px",
               backgroundColor: "#2A555A",
               color: "white",
               border: "none",
-              padding: "12px 20px",
-              borderRadius: "6px",
+              padding: "14px 20px",
+              borderRadius: "8px",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "16px",
               fontWeight: "600",
+              width: "100%",
             }}
           >
-            <Plus size={16} />
+            <Plus size={18} />
             Ajouter un produit
           </button>
           <button
@@ -454,51 +470,53 @@ export default function AdminDashboard() {
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "8px",
               backgroundColor: "#059669",
               color: "white",
               border: "none",
-              padding: "12px 20px",
-              borderRadius: "6px",
+              padding: "14px 20px",
+              borderRadius: "8px",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "16px",
               fontWeight: "600",
+              width: "100%",
             }}
           >
-            <FolderPlus size={16} />
+            <FolderPlus size={18} />
             Ajouter une catégorie
           </button>
         </div>
 
-        {/* Products Section */}
+        {/* Products Section - Mobile Optimized */}
         <div
           style={{
             backgroundColor: "white",
             borderRadius: "8px",
-            padding: "24px",
-            marginBottom: "30px",
+            padding: "15px",
+            marginBottom: "20px",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <h2 style={{ fontSize: "20px", fontWeight: "600", color: "#1f2937", marginBottom: "20px" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#1f2937", marginBottom: "15px" }}>
             Produits ({products.length})
           </h2>
           
           {loading ? (
             <p>Chargement des produits...</p>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "15px" }}>
               {products.map((product) => (
                 <div
                   key={product.id}
                   style={{
                     border: "1px solid #e5e7eb",
                     borderRadius: "8px",
-                    padding: "16px",
+                    padding: "12px",
                     backgroundColor: "#fafafa",
                   }}
                 >
-                  <div style={{ position: "relative", width: "100%", height: "200px", marginBottom: "12px" }}>
+                  <div style={{ position: "relative", width: "100%", height: "180px", marginBottom: "10px" }}>
                     <Image
                       src={product.mainImage || product.image1 || "/placeholder.svg"}
                       alt={product.name}
@@ -506,23 +524,23 @@ export default function AdminDashboard() {
                       style={{ objectFit: "cover", borderRadius: "6px" }}
                     />
                   </div>
-                  <h3 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px" }}>{product.name}</h3>
+                  <h3 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "6px" }}>{product.name}</h3>
                   
                   {/* Price with promotion display */}
-                  <div style={{ marginBottom: "8px" }}>
+                  <div style={{ marginBottom: "6px" }}>
                     {product.is_on_promotion && product.promotion_price ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                        <p style={{ fontSize: "14px", color: "#ff4444", fontWeight: "600", margin: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                        <p style={{ fontSize: "12px", color: "#ff4444", fontWeight: "600", margin: 0 }}>
                           Prix promo: {product.promotion_price} DHS
                         </p>
-                        <p style={{ fontSize: "12px", color: "#6b7280", textDecoration: "line-through", margin: 0 }}>
+                        <p style={{ fontSize: "10px", color: "#6b7280", textDecoration: "line-through", margin: 0 }}>
                           {product.price} DHS
                         </p>
                         <span style={{ 
                           backgroundColor: "#ff4444", 
                           color: "white", 
-                          fontSize: "10px", 
-                          padding: "2px 6px", 
+                          fontSize: "8px", 
+                          padding: "2px 4px", 
                           borderRadius: "3px",
                           fontWeight: "600"
                         }}>
@@ -530,31 +548,31 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                     ) : (
-                      <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "0" }}>
+                      <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "0" }}>
                         Prix: {product.price} DHS
                       </p>
                     )}
                   </div>
                   
-                  <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "8px" }}>
+                  <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "6px" }}>
                     Catégorie: {product.category}
                   </p>
-                  <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "12px" }}>
+                  <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px" }}>
                     Stock: {product.in_stock ? "En stock" : "Rupture"}
                   </p>
                   
                   {/* Show color variants if any */}
                   {product.variants && product.variants.some(v => v.color) && (
-                    <div style={{ marginBottom: "12px" }}>
-                      <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}>Couleurs:</p>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    <div style={{ marginBottom: "10px" }}>
+                      <p style={{ fontSize: "10px", color: "#6b7280", marginBottom: "4px" }}>Couleurs:</p>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
                         {Array.from(new Set(product.variants.filter(v => v.color).map(v => v.color!))).map(color => (
                           <span
                             key={color}
                             style={{
-                              fontSize: "10px",
+                              fontSize: "8px",
                               backgroundColor: "#e5e7eb",
-                              padding: "2px 6px",
+                              padding: "2px 4px",
                               borderRadius: "3px",
                             }}
                           >
@@ -565,20 +583,22 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div style={{ display: "flex", gap: "6px" }}>
                     <button
                       onClick={() => handleEditProduct(product)}
                       style={{
                         display: "flex",
                         alignItems: "center",
+                        justifyContent: "center",
                         gap: "4px",
                         backgroundColor: "#3b82f6",
                         color: "white",
                         border: "none",
-                        padding: "6px 12px",
+                        padding: "8px 12px",
                         borderRadius: "4px",
                         cursor: "pointer",
-                        fontSize: "12px",
+                        fontSize: "11px",
+                        flex: 1,
                       }}
                     >
                       <Edit size={12} />
@@ -589,14 +609,16 @@ export default function AdminDashboard() {
                       style={{
                         display: "flex",
                         alignItems: "center",
+                        justifyContent: "center",
                         gap: "4px",
                         backgroundColor: "#ef4444",
                         color: "white",
                         border: "none",
-                        padding: "6px 12px",
+                        padding: "8px 12px",
                         borderRadius: "4px",
                         cursor: "pointer",
-                        fontSize: "12px",
+                        fontSize: "11px",
+                        flex: 1,
                       }}
                     >
                       <Trash2 size={12} />
@@ -609,32 +631,32 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Categories Section */}
+        {/* Categories Section - Mobile Optimized */}
         <div
           style={{
             backgroundColor: "white",
             borderRadius: "8px",
-            padding: "24px",
+            padding: "15px",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <h2 style={{ fontSize: "20px", fontWeight: "600", color: "#1f2937", marginBottom: "20px" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#1f2937", marginBottom: "15px" }}>
             Catégories ({categories.length})
           </h2>
           
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "15px" }}>
             {categories.map((category) => (
               <div
                 key={category.id}
                 style={{
                   border: "1px solid #e5e7eb",
                   borderRadius: "8px",
-                  padding: "16px",
+                  padding: "12px",
                   backgroundColor: "#fafafa",
                 }}
               >
                 {category.image && (
-                  <div style={{ position: "relative", width: "100%", height: "120px", marginBottom: "12px" }}>
+                  <div style={{ position: "relative", width: "100%", height: "100px", marginBottom: "10px" }}>
                     <Image
                       src={category.image || "/placeholder.svg"}
                       alt={category.name}
@@ -643,27 +665,29 @@ export default function AdminDashboard() {
                     />
                   </div>
                 )}
-                <h3 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px" }}>{category.name}</h3>
+                <h3 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "6px" }}>{category.name}</h3>
                 {category.description && (
-                  <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "12px" }}>
+                  <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px" }}>
                     {category.description}
                   </p>
                 )}
                 
-                <div style={{ display: "flex", gap: "8px" }}>
+                <div style={{ display: "flex", gap: "6px" }}>
                   <button
                     onClick={() => handleEditCategory(category)}
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "4px",
                       backgroundColor: "#3b82f6",
                       color: "white",
                       border: "none",
-                      padding: "6px 12px",
+                      padding: "8px 12px",
                       borderRadius: "4px",
                       cursor: "pointer",
-                      fontSize: "12px",
+                      fontSize: "11px",
+                      flex: 1,
                     }}
                   >
                     <Edit size={12} />
@@ -674,14 +698,16 @@ export default function AdminDashboard() {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                       gap: "4px",
                       backgroundColor: "#ef4444",
                       color: "white",
                       border: "none",
-                      padding: "6px 12px",
+                      padding: "8px 12px",
                       borderRadius: "4px",
                       cursor: "pointer",
-                      fontSize: "12px",
+                      fontSize: "11px",
+                      flex: 1,
                     }}
                   >
                     <Trash2 size={12} />
@@ -694,7 +720,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Product Form Modal */}
+      {/* Product Form Modal - Mobile Optimized */}
       {showProductForm && (
         <div
           style={{
@@ -705,25 +731,26 @@ export default function AdminDashboard() {
             bottom: 0,
             backgroundColor: "rgba(0, 0, 0, 0.5)",
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
             zIndex: 1000,
-            padding: "20px",
+            padding: "10px",
+            overflowY: "auto",
           }}
         >
           <div
             style={{
               backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "24px",
-              maxWidth: "800px",
+              borderRadius: "12px",
+              padding: "20px",
               width: "100%",
-              maxHeight: "90vh",
-              overflowY: "auto",
+              maxWidth: "500px",
+              marginTop: "20px",
+              marginBottom: "20px",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ fontSize: "20px", fontWeight: "600", margin: 0 }}>
+              <h3 style={{ fontSize: "18px", fontWeight: "600", margin: 0 }}>
                 {editingProduct ? "Modifier le produit" : "Ajouter un produit"}
               </h3>
               <button
@@ -735,98 +762,155 @@ export default function AdminDashboard() {
                   backgroundColor: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  padding: "4px",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitProduct} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Nom du produit</label>
-                <input
-                  type="text"
-                  value={productForm.name}
-                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Description</label>
-                <textarea
-                  value={productForm.description}
-                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                  rows={3}
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                <div>
-                  <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Prix (DHS)</label>
+            <form onSubmit={handleSubmitProduct} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              {/* Basic Info Section */}
+              <div style={{ backgroundColor: "#f8f9fa", padding: "15px", borderRadius: "8px" }}>
+                <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#2A555A" }}>
+                  Informations de base
+                </h4>
+                
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                    Nom du produit
+                  </label>
                   <input
-                    type="number"
-                    step="0.01"
-                    value={productForm.price}
-                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                    type="text"
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                     required
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "4px",
-                      fontSize: "14px",
+                      padding: "12px",
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "8px",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
                     }}
                   />
                 </div>
 
-                <div>
-                  <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Coût (DHS)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={productForm.cost}
-                    onChange={(e) => setProductForm({ ...productForm, cost: e.target.value })}
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                    Description
+                  </label>
+                  <textarea
+                    value={productForm.description}
+                    onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                    rows={3}
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "4px",
-                      fontSize: "14px",
+                      padding: "12px",
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "8px",
+                      fontSize: "16px",
+                      resize: "vertical",
+                      boxSizing: "border-box",
                     }}
                   />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                      Prix (DHS)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={productForm.price}
+                      onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        border: "2px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "16px",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                      Coût (DHS)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={productForm.cost}
+                      onChange={(e) => setProductForm({ ...productForm, cost: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        border: "2px solid #e5e7eb",
+                        borderRadius: "8px",
+                        fontSize: "16px",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                    Catégorie
+                  </label>
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "8px",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <option value="">Sélectionner une catégorie</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               {/* Promotion Section */}
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+              <div style={{ backgroundColor: "#fff3cd", padding: "15px", borderRadius: "8px" }}>
+                <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#856404" }}>
+                  Promotion
+                </h4>
+                
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "15px" }}>
                   <ToggleSwitch
+                    label=""
                     checked={productForm.is_on_promotion}
                     onChange={(checked) => setProductForm({ ...productForm, is_on_promotion: checked })}
                   />
-                  <label style={{ fontWeight: "600", color: "#1f2937" }}>Activer la promotion</label>
+                  <label style={{ fontWeight: "600", color: "#856404", fontSize: "14px" }}>
+                    Activer la promotion
+                  </label>
                 </div>
                 
                 {productForm.is_on_promotion && (
                   <div>
-                    <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Prix promotionnel (DHS)</label>
+                    <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                      Prix promotionnel (DHS)
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -835,45 +919,26 @@ export default function AdminDashboard() {
                       required={productForm.is_on_promotion}
                       style={{
                         width: "100%",
-                        padding: "8px 12px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "4px",
-                        fontSize: "14px",
+                        padding: "12px",
+                        border: "2px solid #ffc107",
+                        borderRadius: "8px",
+                        fontSize: "16px",
+                        boxSizing: "border-box",
                       }}
                     />
                   </div>
                 )}
               </div>
 
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Catégorie</label>
-                <select
-                  value={productForm.category}
-                  onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    fontSize: "14px",
-                  }}
-                >
-                  <option value="">Sélectionner une catégorie</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Product Images - Only show if no colors are selected */}
+              {/* Images Section - Only show if no colors are selected */}
               {selectedColors.length === 0 && (
-                <div>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Images du produit</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div style={{ backgroundColor: "#e3f2fd", padding: "15px", borderRadius: "8px" }}>
+                  <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#1565c0" }}>
+                    Images du produit
+                  </h4>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
                     <div>
-                      <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#6b7280" }}>
+                      <label style={{ display: "block", marginBottom: "6px", fontSize: "12px", color: "#1565c0", fontWeight: "600" }}>
                         Image principale
                       </label>
                       <ImageUpload
@@ -882,7 +947,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#6b7280" }}>
+                      <label style={{ display: "block", marginBottom: "6px", fontSize: "12px", color: "#1565c0", fontWeight: "600" }}>
                         Image 2
                       </label>
                       <ImageUpload
@@ -891,7 +956,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#6b7280" }}>
+                      <label style={{ display: "block", marginBottom: "6px", fontSize: "12px", color: "#1565c0", fontWeight: "600" }}>
                         Image 3
                       </label>
                       <ImageUpload
@@ -900,7 +965,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "#6b7280" }}>
+                      <label style={{ display: "block", marginBottom: "6px", fontSize: "12px", color: "#1565c0", fontWeight: "600" }}>
                         Image 4
                       </label>
                       <ImageUpload
@@ -913,11 +978,11 @@ export default function AdminDashboard() {
               )}
 
               {/* Color Selection */}
-              <div>
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+              <div style={{ backgroundColor: "#f3e5f5", padding: "15px", borderRadius: "8px" }}>
+                <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#7b1fa2" }}>
                   Couleurs disponibles (optionnel)
-                </label>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: "8px", marginBottom: "16px" }}>
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px", marginBottom: "15px" }}>
                   {PREDEFINED_COLORS.map((color) => (
                     <button
                       key={color.name}
@@ -925,25 +990,25 @@ export default function AdminDashboard() {
                       onClick={() => handleColorSelection(color.name)}
                       style={{
                         display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
-                        gap: "6px",
-                        padding: "6px 8px",
-                        border: selectedColors.includes(color.name) ? "2px solid #2A555A" : "1px solid #d1d5db",
-                        backgroundColor: selectedColors.includes(color.name) ? "#f0fdf4" : "white",
-                        borderRadius: "4px",
+                        gap: "4px",
+                        padding: "8px",
+                        border: selectedColors.includes(color.name) ? "3px solid #7b1fa2" : "2px solid #e5e7eb",
+                        backgroundColor: selectedColors.includes(color.name) ? "#f3e5f5" : "white",
+                        borderRadius: "8px",
                         cursor: "pointer",
-                        fontSize: "12px",
-                        textAlign: "left",
+                        fontSize: "10px",
+                        textAlign: "center",
                       }}
                     >
                       <div
                         style={{
-                          width: "16px",
-                          height: "16px",
-                          borderRadius: "2px",
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "4px",
                           backgroundColor: color.hex,
                           border: "1px solid #ccc",
-                          flexShrink: 0,
                         }}
                       />
                       <span>{color.name}</span>
@@ -954,13 +1019,13 @@ export default function AdminDashboard() {
                 {/* Color Images - Only show for selected colors */}
                 {selectedColors.length > 0 && (
                   <div>
-                    <h4 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "12px" }}>
+                    <h5 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "12px", color: "#7b1fa2" }}>
                       Images par couleur (obligatoire)
-                    </h4>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" }}>
+                    </h5>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                       {selectedColors.map((colorName) => (
-                        <div key={colorName} style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px" }}>
-                          <label style={{ display: "block", marginBottom: "8px", fontSize: "12px", fontWeight: "600" }}>
+                        <div key={colorName} style={{ border: "2px solid #e5e7eb", borderRadius: "8px", padding: "12px" }}>
+                          <label style={{ display: "block", marginBottom: "8px", fontSize: "12px", fontWeight: "600", color: "#7b1fa2" }}>
                             Image pour {colorName}
                           </label>
                           <ImageUpload
@@ -974,41 +1039,76 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              {/* Size and Stock Management */}
-              <div>
-                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+              {/* Stock Management - Mobile Friendly */}
+              <div style={{ backgroundColor: "#e8f5e8", padding: "15px", borderRadius: "8px" }}>
+                <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#2e7d32" }}>
                   Gestion des tailles et stock
-                </label>
+                </h4>
                 
                 {selectedColors.length > 0 ? (
                   // With colors: show stock for each color-size combination
                   <div>
                     {selectedColors.map((colorName) => (
-                      <div key={colorName} style={{ marginBottom: "20px", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px" }}>
-                        <h4 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "12px", color: "#2A555A" }}>
+                      <div key={colorName} style={{ marginBottom: "20px", border: "2px solid #4caf50", borderRadius: "8px", padding: "12px", backgroundColor: "white" }}>
+                        <h5 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "12px", color: "#2e7d32" }}>
                           Stock pour {colorName}
-                        </h4>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "8px" }}>
+                        </h5>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "10px" }}>
                           {ALL_SIZES.map((size) => {
                             const variant = variants.find(v => v.color === colorName && v.size === size)
+                            const currentStock = variant?.stock_quantity || 0
                             return (
-                              <div key={`${colorName}-${size}`}>
-                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px" }}>
+                              <div key={`${colorName}-${size}`} style={{ textAlign: "center" }}>
+                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "6px", color: "#2e7d32" }}>
                                   {size}
                                 </label>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={variant?.stock_quantity || 0}
-                                  onChange={(e) => updateVariantStock(colorName, size, parseInt(e.target.value) || 0)}
-                                  style={{
-                                    width: "100%",
-                                    padding: "4px 6px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "3px",
-                                    fontSize: "12px",
-                                  }}
-                                />
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => decrementStock(colorName, size)}
+                                    style={{
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#f44336",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      cursor: "pointer",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    <Minus size={16} />
+                                  </button>
+                                  <span style={{ 
+                                    minWidth: "30px", 
+                                    textAlign: "center", 
+                                    fontSize: "14px", 
+                                    fontWeight: "600",
+                                    color: "#2e7d32"
+                                  }}>
+                                    {currentStock}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => incrementStock(colorName, size)}
+                                    style={{
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#4caf50",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      cursor: "pointer",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    <Plus size={16} />
+                                  </button>
+                                </div>
                               </div>
                             )
                           })}
@@ -1018,38 +1118,83 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   // Without colors: show stock for each size only
-                  <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "8px" }}>
+                  <div style={{ border: "2px solid #4caf50", borderRadius: "8px", padding: "12px", backgroundColor: "white" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "10px" }}>
                       {ALL_SIZES.map((size) => {
                         const variant = variants.find(v => !v.color && v.size === size)
+                        const currentStock = variant?.stock_quantity || 0
                         return (
-                          <div key={size}>
-                            <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "4px" }}>
+                          <div key={size} style={{ textAlign: "center" }}>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: "600", marginBottom: "6px", color: "#2e7d32" }}>
                               {size}
                             </label>
-                            <input
-                              type="number"
-                              min="0"
-                              value={variant?.stock_quantity || 0}
-                              onChange={(e) => {
-                                const stock = parseInt(e.target.value) || 0
-                                const existingVariantIndex = variants.findIndex(v => !v.color && v.size === size)
-                                if (existingVariantIndex >= 0) {
-                                  setVariants(prev => prev.map((v, i) => 
-                                    i === existingVariantIndex ? { ...v, stock_quantity: stock } : v
-                                  ))
-                                } else {
-                                  setVariants(prev => [...prev, { size, stock_quantity: stock, color: null, image_url: null }])
-                                }
-                              }}
-                              style={{
-                                width: "100%",
-                                padding: "4px 6px",
-                                border: "1px solid #d1d5db",
-                                borderRadius: "3px",
-                                fontSize: "12px",
-                              }}
-                            />
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newStock = Math.max(0, currentStock - 1)
+                                  const existingVariantIndex = variants.findIndex(v => !v.color && v.size === size)
+                                  if (existingVariantIndex >= 0) {
+                                    setVariants(prev => prev.map((v, i) => 
+                                      i === existingVariantIndex ? { ...v, stock_quantity: newStock } : v
+                                    ))
+                                  } else if (newStock > 0) {
+                                    setVariants(prev => [...prev, { size, stock_quantity: newStock, color: null, image_url: null }])
+                                  }
+                                }}
+                                style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  backgroundColor: "#f44336",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Minus size={16} />
+                              </button>
+                              <span style={{ 
+                                minWidth: "30px", 
+                                textAlign: "center", 
+                                fontSize: "14px", 
+                                fontWeight: "600",
+                                color: "#2e7d32"
+                              }}>
+                                {currentStock}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newStock = currentStock + 1
+                                  const existingVariantIndex = variants.findIndex(v => !v.color && v.size === size)
+                                  if (existingVariantIndex >= 0) {
+                                    setVariants(prev => prev.map((v, i) => 
+                                      i === existingVariantIndex ? { ...v, stock_quantity: newStock } : v
+                                    ))
+                                  } else {
+                                    setVariants(prev => [...prev, { size, stock_quantity: newStock, color: null, image_url: null }])
+                                  }
+                                }}
+                                style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  backgroundColor: "#4caf50",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
                           </div>
                         )
                       })}
@@ -1058,25 +1203,53 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              {/* Toggles */}
-              <div style={{ display: "flex", gap: "20px" }}>
-                <div>
-                  <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Produit vedette</label>
-                  <ToggleSwitch
-                    checked={productForm.featured}
-                    onChange={(checked) => setProductForm({ ...productForm, featured: checked })}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>En stock</label>
-                  <ToggleSwitch
-                    checked={productForm.in_stock}
-                    onChange={(checked) => setProductForm({ ...productForm, in_stock: checked })}
-                  />
+              {/* Settings */}
+              <div style={{ backgroundColor: "#fff8e1", padding: "15px", borderRadius: "8px" }}>
+                <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "15px", color: "#f57c00" }}>
+                  Paramètres
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <label style={{ fontWeight: "600", color: "#f57c00", fontSize: "14px" }}>
+                      Produit vedette
+                    </label>
+                    <ToggleSwitch
+                      label=""
+                      checked={productForm.featured}
+                      onChange={(checked) => setProductForm({ ...productForm, featured: checked })}
+                    />
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <label style={{ fontWeight: "600", color: "#f57c00", fontSize: "14px" }}>
+                      En stock
+                    </label>
+                    <ToggleSwitch
+                      label=""
+                      checked={productForm.in_stock}
+                      onChange={(checked) => setProductForm({ ...productForm, in_stock: checked })}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "20px" }}>
+              {/* Action Buttons */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "15px 20px",
+                    backgroundColor: "#2A555A",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    width: "100%",
+                  }}
+                >
+                  {editingProduct ? "Mettre à jour le produit" : "Créer le produit"}
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -1084,30 +1257,16 @@ export default function AdminDashboard() {
                     resetProductForm()
                   }}
                   style={{
-                    padding: "10px 20px",
-                    border: "1px solid #d1d5db",
+                    padding: "15px 20px",
+                    border: "2px solid #d1d5db",
                     backgroundColor: "white",
-                    borderRadius: "6px",
+                    borderRadius: "8px",
                     cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: "16px",
+                    width: "100%",
                   }}
                 >
                   Annuler
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#2A555A",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                  }}
-                >
-                  {editingProduct ? "Mettre à jour" : "Créer"}
                 </button>
               </div>
             </form>
@@ -1115,7 +1274,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Category Form Modal */}
+      {/* Category Form Modal - Mobile Optimized */}
       {showCategoryForm && (
         <div
           style={{
@@ -1129,20 +1288,20 @@ export default function AdminDashboard() {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
-            padding: "20px",
+            padding: "10px",
           }}
         >
           <div
             style={{
               backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "24px",
-              maxWidth: "500px",
+              borderRadius: "12px",
+              padding: "20px",
               width: "100%",
+              maxWidth: "400px",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ fontSize: "20px", fontWeight: "600", margin: 0 }}>
+              <h3 style={{ fontSize: "18px", fontWeight: "600", margin: 0 }}>
                 {editingCategory ? "Modifier la catégorie" : "Ajouter une catégorie"}
               </h3>
               <button
@@ -1154,16 +1313,22 @@ export default function AdminDashboard() {
                   backgroundColor: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  padding: "4px",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitCategory} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <form onSubmit={handleSubmitCategory} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Nom de la catégorie</label>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                  Nom de la catégorie
+                </label>
                 <input
                   type="text"
                   value={categoryForm.name}
@@ -1171,40 +1336,62 @@ export default function AdminDashboard() {
                   required
                   style={{
                     width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    fontSize: "14px",
+                    padding: "12px",
+                    border: "2px solid #e5e7eb",
+                    borderRadius: "8px",
+                    fontSize: "16px",
+                    boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Description</label>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                  Description
+                </label>
                 <textarea
                   value={categoryForm.description}
                   onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
                   rows={3}
                   style={{
                     width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "4px",
-                    fontSize: "14px",
+                    padding: "12px",
+                    border: "2px solid #e5e7eb",
+                    borderRadius: "8px",
+                    fontSize: "16px",
                     resize: "vertical",
+                    boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>Image de la catégorie</label>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: "600", fontSize: "14px" }}>
+                  Image de la catégorie
+                </label>
                 <ImageUpload
                   onImageUploaded={(url) => setCategoryForm({ ...categoryForm, image: url })}
                   currentImage={categoryForm.image}
                 />
               </div>
 
-              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "15px 20px",
+                    backgroundColor: "#059669",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    width: "100%",
+                  }}
+                >
+                  {editingCategory ? "Mettre à jour la catégorie" : "Créer la catégorie"}
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -1212,30 +1399,16 @@ export default function AdminDashboard() {
                     resetCategoryForm()
                   }}
                   style={{
-                    padding: "10px 20px",
-                    border: "1px solid #d1d5db",
+                    padding: "15px 20px",
+                    border: "2px solid #d1d5db",
                     backgroundColor: "white",
-                    borderRadius: "6px",
+                    borderRadius: "8px",
                     cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: "16px",
+                    width: "100%",
                   }}
                 >
                   Annuler
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#059669",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                  }}
-                >
-                  {editingCategory ? "Mettre à jour" : "Créer"}
                 </button>
               </div>
             </form>

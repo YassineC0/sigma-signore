@@ -1,10 +1,10 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useProducts } from "@/hooks/useProducts"
-import { useCart } from "@/contexts/CartContext"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ProductCard } from "@/components/product-card" // Import ProductCard
+import type { Product } from "@/types/product"
 
 interface CategoryProductsPageProps {
   category?: string
@@ -12,16 +12,23 @@ interface CategoryProductsPageProps {
 }
 
 export function CategoryProductsPage({ category, title }: CategoryProductsPageProps) {
-  console.log("CategoryProductsPage - category prop:", category)
-  console.log("CategoryProductsPage - title prop:", title)
-  
   const [currentPage, setCurrentPage] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
   const { products, pagination, loading, error } = useProducts({
     category,
     page: currentPage,
     limit: 20,
   })
-  const { addToCart } = useCart()
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage)
@@ -42,7 +49,7 @@ export function CategoryProductsPage({ category, title }: CategoryProductsPagePr
               width: "40px",
               height: "40px",
               border: "4px solid #f3f4f6",
-              borderTop: "4px solid #2A555A", // Changed from yellow
+              borderTop: "4px solid #2A555A",
               borderRadius: "50%",
               animation: "spin 1s linear infinite",
               marginBottom: "20px",
@@ -84,19 +91,19 @@ export function CategoryProductsPage({ category, title }: CategoryProductsPagePr
             textAlign: "center",
             color: "#1f2937",
             marginBottom: "60px",
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Playfair Display', serif", // Changed font for consistency
             textTransform: "uppercase",
             letterSpacing: "-0.02em",
           }}
         >
-          {title} <span style={{ color: "#2A555A" }}>COLLECTION</span> {/* Changed from yellow */}
+          {title} <span style={{ color: "#4a4a4a" }}>COLLECTION</span>
         </h1>
 
         {/* Products Count */}
         {safePagination && (
           <div style={{ textAlign: "center", marginBottom: "40px" }}>
             <p style={{ fontSize: "16px", color: "#6b7280" }}>
-              {safePagination.total} produit{safePagination.total > 1 ? "s" : ""} trouvé
+              
               {safePagination.total > 1 ? "s" : ""}
               {safePagination.pages > 1 && (
                 <span>
@@ -117,122 +124,20 @@ export function CategoryProductsPage({ category, title }: CategoryProductsPagePr
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fill, minmax(280px, 1fr))", // Changed to 1 column for mobile
                 gap: "30px",
                 marginBottom: "60px",
               }}
             >
-              {products.map((product) => (
-                <Link
+              {products.map((product, index) => (
+                <ProductCard
                   key={product.id}
-                  href={`/product/${product.id}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: "#ffffff",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      transition: "all 0.3s ease",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      border: "1px solid #f3f4f6",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-8px)"
-                      e.currentTarget.style.boxShadow =
-                        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-                      e.currentTarget.style.borderColor = "#2A555A" // Changed from yellow
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)"
-                      e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)"
-                      e.currentTarget.style.borderColor = "#f3f4f6"
-                    }}
-                  >
-                    {/* Product Image */}
-                    <div style={{ position: "relative", width: "100%", aspectRatio: "1", overflow: "hidden" }}>
-                      <img
-                        src={product.image1 || "/placeholder.svg?height=300&width=300"}
-                        alt={product.name}
-                        style={{ 
-                          width: "100%", 
-                          height: "100%", 
-                          objectFit: "cover", 
-                          transition: "transform 0.3s ease" 
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "scale(1.05)"
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "scale(1)"
-                        }}
-                      />
-                    </div>
-                    {/* Product Info */}
-                    <div style={{ padding: "24px", flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                      <h3
-                        style={{
-                          fontSize: "18px",
-                          fontWeight: "700",
-                          color: "#1f2937",
-                          marginBottom: "12px",
-                          lineHeight: "1.4",
-                          minHeight: "48px",
-                        }}
-                      >
-                        {product.name}
-                      </h3>
-                      <p
-                        style={{
-                          fontSize: "24px",
-                          fontWeight: "800",
-                          color: "#2A555A", // Changed from yellow
-                          marginBottom: "20px",
-                          marginTop: "auto",
-                        }}
-                      >
-                        {product.price.toFixed(2)} DHS
-                      </p>
-                      {/* Action Button */}
-                      <Button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          addToCart(product)
-                        }}
-                        style={{
-                          width: "100%",
-                          backgroundColor: "#2A555A", // Changed from yellow
-                          color: "#ffffff", // Changed text color to white for contrast
-                          border: "none",
-                          padding: "14px 20px",
-                          fontSize: "14px",
-                          fontWeight: "700",
-                          borderRadius: "8px",
-                          cursor: "pointer",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
-                          transition: "all 0.3s ease",
-                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#1f2937" // Darker green on hover
-                          e.currentTarget.style.transform = "translateY(-2px)"
-                          e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.15)"
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#2A555A" // Back to original green
-                          e.currentTarget.style.transform = "translateY(0)"
-                          e.currentTarget.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)"
-                        }}
-                      >
-                        Ajouter au panier
-                      </Button>
-                    </div>
-                  </div>
-                </Link>
+                  product={product as Product}
+                  index={index}
+                  isVisible={true} // All products are visible in the grid
+                  isMobile={isMobile}
+                  showAddToCartButton={false} // Hide "Ajouter au panier" button on this page
+                />
               ))}
             </div>
 
@@ -290,7 +195,7 @@ export function CategoryProductsPage({ category, title }: CategoryProductsPagePr
                     fontSize: "16px",
                     fontWeight: "600",
                     color: "#1f2937",
-                    border: "2px solid #2A555A", // Changed from yellow
+                    border: "2px solid #2A555A",
                   }}
                 >
                   Page {safePagination.page} sur {safePagination.pages}

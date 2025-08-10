@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react" // Import useEffect
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, Trash2, X } from "lucide-react"
+import { Minus, Plus, Trash2, X } from 'lucide-react'
 
 export function CartModal() {
-  const { items, isOpen, setIsOpen, removeFromCart, updateQuantity, getTotalPrice } = useCart()
+  const { cartItems, isOpen, setIsOpen, removeFromCart, updateQuantity, cartTotal } = useCart()
   const [isMounted, setIsMounted] = useState(false)
   const [screenWidth, setScreenWidth] = useState(0)
 
@@ -17,10 +17,9 @@ export function CartModal() {
     const updateScreenWidth = () => {
       setScreenWidth(window.innerWidth)
     }
-
     updateScreenWidth()
     window.addEventListener("resize", updateScreenWidth)
-
+    
     // Prevent body scroll when modal is open
     if (isOpen) {
       document.body.style.overflow = "hidden"
@@ -39,7 +38,7 @@ export function CartModal() {
   }
 
   const isMobile = screenWidth <= 768
-  const subtotal = getTotalPrice()
+  const subtotal = cartTotal
 
   return (
     <>
@@ -101,7 +100,7 @@ export function CartModal() {
               letterSpacing: "0.5px",
             }}
           >
-            Panier ({items.length})
+            Panier ({cartItems.length})
           </h2>
           <button
             onClick={() => setIsOpen(false)}
@@ -137,7 +136,7 @@ export function CartModal() {
             minHeight: 0,
           }}
         >
-          {items.length === 0 ? (
+          {cartItems.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 16px" }}>
               <div
                 style={{
@@ -157,8 +156,8 @@ export function CartModal() {
               <Button
                 onClick={() => setIsOpen(false)}
                 style={{
-                  backgroundColor: "#2A555A", // Changed from yellow
-                  color: "white", // Changed for better contrast
+                  backgroundColor: "#2A555A",
+                  color: "white",
                   fontWeight: "700",
                   padding: "12px 20px",
                   borderRadius: "8px",
@@ -167,10 +166,10 @@ export function CartModal() {
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#1F4044" // Darker green on hover
+                  e.currentTarget.style.backgroundColor = "#1F4044"
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#2A555A" // Back to original green
+                  e.currentTarget.style.backgroundColor = "#2A555A"
                 }}
               >
                 Continuer vos achats
@@ -178,7 +177,7 @@ export function CartModal() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {items.map((item, index) => (
+              {cartItems.map((item, index) => (
                 <div
                   key={`${item.id}-${item.selectedSize || "no-size"}-${index}`}
                   style={{
@@ -194,7 +193,7 @@ export function CartModal() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f1f5f9"
-                    e.currentTarget.style.borderColor = "#2A555A" // Changed from yellow
+                    e.currentTarget.style.borderColor = "#2A555A"
                     e.currentTarget.style.transform = "translateY(-1px)"
                     e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)"
                   }}
@@ -218,13 +217,14 @@ export function CartModal() {
                     }}
                   >
                     <Image
-                      src={item.image1 || "/placeholder.svg?height=70&width=70"}
+                      src={item.imageUrl || "/placeholder.svg?height=70&width=70"}
                       alt={item.name}
                       fill
                       style={{ objectFit: "cover" }}
                       sizes={isMobile ? "60px" : "70px"}
                     />
                   </div>
+
                   {/* Product Details */}
                   <div
                     style={{
@@ -247,8 +247,23 @@ export function CartModal() {
                       title={item.name}
                     >
                       {item.name}
+                      {item.isOnPromotion && (
+                        <span
+                          style={{
+                            backgroundColor: "#ef4444",
+                            color: "white",
+                            fontSize: "8px",
+                            fontWeight: "700",
+                            padding: "2px 4px",
+                            borderRadius: "3px",
+                            marginLeft: "6px",
+                          }}
+                        >
+                          PROMO
+                        </span>
+                      )}
                     </h3>
-                    {item.selectedSize && (
+                    {(item.selectedSize || item.selectedColor) && (
                       <p
                         style={{
                           fontSize: "12px",
@@ -259,19 +274,34 @@ export function CartModal() {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        Taille: {item.selectedSize}
+                        {item.selectedColor && `Couleur: ${item.selectedColor}`}
+                        {item.selectedColor && item.selectedSize && " • "}
+                        {item.selectedSize && `Taille: ${item.selectedSize}`}
                       </p>
                     )}
-                    <p
-                      style={{
-                        color: "#2A555A", // Changed from yellow
-                        fontSize: isMobile ? "16px" : "18px",
-                        fontWeight: "800",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {item.price.toFixed(2)} DHS
-                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                      {item.isOnPromotion && (
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "#6b7280",
+                            textDecoration: "line-through",
+                          }}
+                        >
+                          {item.originalPrice.toFixed(2)} DHS
+                        </span>
+                      )}
+                      <p
+                        style={{
+                          color: "#2A555A",
+                          fontSize: isMobile ? "16px" : "18px",
+                          fontWeight: "800",
+                          margin: 0,
+                        }}
+                      >
+                        {item.price.toFixed(2)} DHS
+                      </p>
+                    </div>
 
                     {/* Quantity Controls */}
                     <div
@@ -284,7 +314,7 @@ export function CartModal() {
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <button
-                          onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                           style={{
                             width: "28px",
@@ -302,7 +332,7 @@ export function CartModal() {
                           onMouseEnter={(e) => {
                             if (item.quantity > 1) {
                               e.currentTarget.style.backgroundColor = "#f3f4f6"
-                              e.currentTarget.style.borderColor = "#2A555A" // Changed from yellow
+                              e.currentTarget.style.borderColor = "#2A555A"
                               e.currentTarget.style.transform = "scale(1.05)"
                             }
                           }}
@@ -316,7 +346,6 @@ export function CartModal() {
                         >
                           <Minus size={14} color={item.quantity <= 1 ? "#9ca3af" : "#374151"} />
                         </button>
-
                         <span
                           style={{
                             fontSize: "14px",
@@ -331,9 +360,8 @@ export function CartModal() {
                         >
                           {item.quantity}
                         </span>
-
                         <button
-                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           style={{
                             width: "28px",
                             height: "28px",
@@ -348,7 +376,7 @@ export function CartModal() {
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = "#f3f4f6"
-                            e.currentTarget.style.borderColor = "#2A555A" // Changed from yellow
+                            e.currentTarget.style.borderColor = "#2A555A"
                             e.currentTarget.style.transform = "scale(1.05)"
                           }}
                           onMouseLeave={(e) => {
@@ -363,24 +391,24 @@ export function CartModal() {
 
                       {/* Remove Button */}
                       <button
-                        onClick={() => removeFromCart(item.cartItemId)}
+                        onClick={() => removeFromCart(item.id)}
                         style={{
                           padding: "6px",
                           borderRadius: "4px",
                           border: "none",
-                          backgroundColor: "#E6F0ED", // Light green variation
-                          color: "#2A555A", // Dark green
+                          backgroundColor: "#E6F0ED",
+                          color: "#2A555A",
                           cursor: "pointer",
                           transition: "all 0.2s ease",
                           flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#D4E0DD" // Darker light green
+                          e.currentTarget.style.backgroundColor = "#D4E0DD"
                           e.currentTarget.style.transform = "scale(1.1)"
-                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(42, 85, 90, 0.3)" // Green shadow
+                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(42, 85, 90, 0.3)"
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#E6F0ED" // Back to original light green
+                          e.currentTarget.style.backgroundColor = "#E6F0ED"
                           e.currentTarget.style.transform = "scale(1)"
                           e.currentTarget.style.boxShadow = "none"
                         }}
@@ -396,7 +424,7 @@ export function CartModal() {
         </div>
 
         {/* Footer - Fixed at bottom */}
-        {items.length > 0 && (
+        {cartItems.length > 0 && (
           <div
             style={{
               borderTop: "2px solid #f3f4f6",
@@ -416,8 +444,8 @@ export function CartModal() {
                 padding: "12px",
                 backgroundColor: "#f8f9fa",
                 borderRadius: "6px",
-                border: "2px solid #2A555A", // Changed from yellow
-                boxShadow: "0 2px 8px rgba(42, 85, 90, 0.2)", // Green shadow
+                border: "2px solid #2A555A",
+                boxShadow: "0 2px 8px rgba(42, 85, 90, 0.2)",
               }}
             >
               <span
@@ -434,7 +462,7 @@ export function CartModal() {
                 style={{
                   fontSize: isMobile ? "18px" : "20px",
                   fontWeight: "800",
-                  color: "#2A555A", // Changed from yellow
+                  color: "#2A555A",
                 }}
               >
                 {subtotal.toFixed(2)} DHS
@@ -447,8 +475,8 @@ export function CartModal() {
                 onClick={() => setIsOpen(false)}
                 style={{
                   width: "100%",
-                  backgroundColor: "#2A555A", // Changed from dark teal
-                  color: "white", // Changed for better contrast
+                  backgroundColor: "#2A555A",
+                  color: "white",
                   border: "none",
                   padding: isMobile ? "14px 16px" : "16px 20px",
                   fontSize: isMobile ? "16px" : "18px",
@@ -458,17 +486,17 @@ export function CartModal() {
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  boxShadow: "0 4px 12px rgba(42, 85, 90, 0.3)", // Green shadow
+                  boxShadow: "0 4px 12px rgba(42, 85, 90, 0.3)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#1F4044" // Darker green on hover
+                  e.currentTarget.style.backgroundColor = "#1F4044"
                   e.currentTarget.style.transform = "translateY(-2px)"
-                  e.currentTarget.style.boxShadow = "0 6px 16px rgba(42, 85, 90, 0.4)" // Darker green shadow
+                  e.currentTarget.style.boxShadow = "0 6px 16px rgba(42, 85, 90, 0.4)"
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#2A555A" // Back to original green
+                  e.currentTarget.style.backgroundColor = "#2A555A"
                   e.currentTarget.style.transform = "translateY(0)"
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(42, 85, 90, 0.3)" // Original green shadow
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(42, 85, 90, 0.3)"
                 }}
               >
                 Commander

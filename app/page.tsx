@@ -5,15 +5,17 @@ import { ModernContact } from "@/components/modern-contact"
 import { ModernFooter } from "@/components/modern-footer"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { ModernCategories } from "@/components/modern-categories"
+import { VintageCollectionSection } from "@/components/vintage-collection-section"
 
 export default function HomePage() {
   return (
     <main>
       <ModernHero />
-      <ModernCategories />
-      <PromotionSection />
-      
       <ModernBestSellers />
+      <ModernCategories />
+      <VintageCollectionSection />
+      
+      
       
       <ModernContact />
       

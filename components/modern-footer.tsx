@@ -7,7 +7,7 @@ export function ModernFooter() {
   return (
     <footer
       style={{
-        backgroundColor: "#1f2937",
+        backgroundColor: "#000000",
         color: "#ffffff",
         padding: "60px 20px",
         fontFamily: "'Inter', sans-serif",
@@ -33,15 +33,15 @@ export function ModernFooter() {
               letterSpacing: "-0.02em",
             }}
           >
-            LUXURY <span style={{ color: "hsl(0, 0%, 90%)" }}>CLOTHES</span>
+            CLASSIQUE <span style={{ color: "hsl(0, 0%, 90%)" }}>SIGNORE</span>
           </div>
           <p style={{ fontSize: "14px", lineHeight: "1.6", color: "#a0aec0" }}>
-            Votre destination pour le streetwear premium. Nous offrons des vêtements de qualité et des designs urbains
+            Nous offrons des vêtements de qualité et des designs urbains
             qui se démarquent.
           </p>
           <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
             <a
-              href="https://www.instagram.com/luxury_.clothess/"
+              href="https://www.instagram.com/classiquesignore/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -54,7 +54,7 @@ export function ModernFooter() {
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#ffffff")}
               />
             </a>
-            <a href="https://wa.me/212657941162" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <a href="https://wa.me/212631366613" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
               <Whatsapp
                 size={24}
                 color="#ffffff"
@@ -64,7 +64,7 @@ export function ModernFooter() {
               />
             </a>
             <a
-              href="https://www.facebook.com/share/1CW4UDwWN6/?mibextid=wwXIfr"
+              href="https://www.facebook.com/classiquesignore"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -139,7 +139,7 @@ export function ModernFooter() {
           <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
             
             <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: "#a0aec0" }}>
-              <Phone size={18} color="#a0aec0" /> +212 657941162
+              <Phone size={18} color="#a0aec0" /> +212 631 366613
             </li>
             
           </ul>
@@ -156,7 +156,7 @@ export function ModernFooter() {
           color: "#a0aec0",
         }}
       >
-        &copy; {new Date().getFullYear()} Luxury Clothes. Tous droits réservés.
+        &copy; {new Date().getFullYear()} Classique Signore. Tous droits réservés.
       </div>
     </footer>
   )

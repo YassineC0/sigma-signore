@@ -55,7 +55,7 @@ export function PromotionSection() {
               letterSpacing: "-0.02em",
             }}
           >
-            OFFRES <span style={{ color: "#2A555A" }}>SPÉCIALES</span>
+            OFFRES <span style={{ color: "#000000" }}>SPÉCIALES</span>
           </h2>
           <p
             style={{

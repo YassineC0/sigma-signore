@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image" // Import Image component
-import { ShoppingCart, User, Menu, X } from "lucide-react"
+import { ShoppingCart, User, Menu, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { CartModal } from "@/components/cart-modal"
 import { useCart } from "@/contexts/CartContext"
@@ -13,9 +13,9 @@ export function ModernHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const { items, isOpen, setIsOpen } = useCart()
+  const { cartItems, isOpen, setIsOpen, cartItemCount } = useCart() // Corrected destructuring
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories()
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+  const totalItems = cartItemCount // Use cartItemCount directly
   const pathname = usePathname()
   const isHomePage = pathname === "/"
 
@@ -50,7 +50,6 @@ export function ModernHeader() {
   const headerBg = isHomePage && !isScrolled ? "transparent" : "white"
   const headerBorder = isHomePage && !isScrolled ? "1px solid transparent" : "1px solid hsl(0 0% 89.8%)"
   const headerShadow = isHomePage && !isScrolled ? "none" : "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
-
   // Text and icon colors will be white when transparent, black when white
   const textColor = isHomePage && !isScrolled ? "white" : "hsl(0 0% 9%)"
   const hoverTextColor = isHomePage && !isScrolled ? "rgba(255,255,255,0.8)" : "hsl(0 0% 40%)"
@@ -153,10 +152,10 @@ export function ModernHeader() {
                   }}
                 >
                   <Image
-                    src="/bgless_logo.png" // Use Image component for logo
+                    src="/logofins.png" // Use Image component for logo
                     alt="L3AOUNI STYLE Logo"
-                    width={100} // Bigger on mobile
-                    height={100}
+                    width={55} // Bigger on mobile
+                    height={50}
                     style={{ filter: "none" }} // Logo always black
                   />
                 </Link>
@@ -220,10 +219,10 @@ export function ModernHeader() {
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                 >
                   <Image
-                    src="/bgless_logo.png" // Use Image component for logo
+                    src="/logofins.png" // Use Image component for logo
                     alt="L3AOUNI STYLE Logo"
-                    width={110} // Standard size for desktop
-                    height={100}
+                    width={70} // Standard size for desktop
+                    height={60}
                     style={{ filter: "none" }}
                   />
                 </Link>

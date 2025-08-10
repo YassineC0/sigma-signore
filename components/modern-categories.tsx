@@ -100,7 +100,7 @@ export function ModernCategories() {
             letterSpacing: "-0.02em",
           }}
         >
-          NOS <span style={{ color: "#2A555A" }}>CATÉGORIES</span>
+          NOS <span style={{ color: "#4a4a4a" }}>CATEGORIES</span>
         </h2>
 
         {categories.length === 0 ? (

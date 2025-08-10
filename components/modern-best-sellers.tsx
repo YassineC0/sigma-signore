@@ -1,18 +1,16 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
 import { useProducts } from "@/hooks/useProducts"
 import Link from "next/link"
 import { ProductCard } from "./product-card" // Import the new ProductCard
 
 export function ModernBestSellers() {
-  const { products, loading, error } = useProducts({ featured: true, limit: 4 })
-  const [visibleProducts, setVisibleProducts] = useState<boolean[]>([])
+  const { products, loading, error } = useProducts({ featured: true, limit: 8 })
   const [isMobile, setIsMobile] = useState(false)
-  const sectionRef = useRef<HTMLDivElement>(null)
-  // addToCart is now passed directly to ProductCard, no longer needed here
-  // const { addToCart } = useCart()
+  const [activeIndex, setActiveIndex] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -26,19 +24,42 @@ export function ModernBestSellers() {
   }, [])
 
   useEffect(() => {
-    if (products.length > 0) {
-      setVisibleProducts(new Array(products.length).fill(false))
-      products.forEach((_, index) => {
-        setTimeout(() => {
-          setVisibleProducts((prev) => {
-            const newState = [...prev]
-            newState[index] = true
-            return newState
-          })
-        }, index * 100)
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer || products.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number.parseInt(entry.target.getAttribute("data-index") || "0", 10)
+            setActiveIndex(index)
+          }
+        })
+      },
+      {
+        root: scrollContainer,
+        rootMargin: "0px",
+        threshold: 0.8, // Adjust threshold as needed for when an item is considered "active"
+      },
+    )
+
+    itemRefs.current.forEach((item) => {
+      if (item) observer.observe(item)
+    })
+
+    return () => {
+      itemRefs.current.forEach((item) => {
+        if (item) observer.unobserve(item)
       })
     }
-  }, [products])
+  }, [products]) // Re-run observer setup when products change
+
+  const scrollToItem = (index: number) => {
+    const item = itemRefs.current[index]
+    if (item) {
+      item.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" })
+    }
+  }
 
   if (loading) {
     return (
@@ -90,17 +111,9 @@ export function ModernBestSellers() {
 
   const bestSellers = products
 
-  const getGridColumns = () => {
-    if (isMobile) {
-      return "1fr" // 1 column on mobile
-    }
-    return "1fr 1fr 1fr 1fr" // 4 columns on desktop
-  }
-
   return (
     <section
       id="best-sellers-section"
-      ref={sectionRef}
       style={{
         width: "100%",
         padding: "80px 0",
@@ -126,7 +139,7 @@ export function ModernBestSellers() {
             textAlign: "center",
             color: "var(--foreground)", // Black text
             marginBottom: "64px",
-            fontFamily: "'Fahkwang, sans-serif",
+            fontFamily: "'Inter', sans-serif",
             textTransform: "uppercase",
             letterSpacing: "-0.02em",
           }}
@@ -136,43 +149,63 @@ export function ModernBestSellers() {
 
         {bestSellers.length > 0 ? (
           <>
-            {/* First Row - 4 products */}
             <div
+              ref={scrollContainerRef}
               style={{
-                display: "grid",
-                gridTemplateColumns: getGridColumns(),
+                display: "flex",
+                overflowX: "scroll",
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "none", // For Firefox
+                msOverflowStyle: "none", // For IE/Edge
+                paddingBottom: "20px", // Space for dots
                 gap: isMobile ? "24px" : "32px", // Increased gap for mobile
-                marginBottom: "48px",
               }}
+              className="[&::-webkit-scrollbar]:hidden" // For Webkit browsers
             >
-              {bestSellers.slice(0, 4).map((product, index) => (
-                <ProductCard
+              {bestSellers.map((product, index) => (
+                <div
                   key={product.id}
-                  product={product}
-                  index={index}
-                  isVisible={visibleProducts[index]}
-                  isMobile={isMobile}
-                />
+                  ref={(el) => (itemRefs.current[index] = el)}
+                  data-index={index}
+                  style={{
+                    flex: "0 0 auto",
+                    width: isMobile ? "calc(100vw - 64px)" : "calc(25% - 24px)", // Adjust width for slider
+                    scrollSnapAlign: "start",
+                  }}
+                >
+                  <ProductCard
+                    product={product}
+                    index={index}
+                    isVisible={true} // Always visible in slider
+                    isMobile={isMobile}
+                  />
+                </div>
               ))}
             </div>
-
-            {/* Second Row - 4 products (if available) */}
-            {bestSellers.length > 4 && (
+            {bestSellers.length > 0 && (
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: getGridColumns(),
-                  gap: isMobile ? "24px" : "32px",
-                  marginBottom: "48px",
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "8px",
+                  marginTop: "20px",
                 }}
               >
-                {bestSellers.slice(4, 8).map((product, index) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    index={index + 4}
-                    isVisible={visibleProducts[index + 4]}
-                    isMobile={isMobile}
+                {bestSellers.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => scrollToItem(index)}
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      backgroundColor: activeIndex === index ? "#1f2937" : "#d1d5db",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
@@ -190,36 +223,36 @@ export function ModernBestSellers() {
           </p>
         )}
 
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", marginTop: "48px" }}>
           <Link href="/products" style={{ textDecoration: "none" }}>
-            <Button
+            <button
               style={{
-                backgroundColor: "#2A555A", // Black button
-                color: "var(--primary-foreground)", // White text
-                padding: "16px 32px",
-                fontSize: "16px",
-                fontWeight: "700",
-                borderRadius: "0",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                transition: "all 0.3s ease",
-                border: "none",
+                backgroundColor: "white",
+                color: "#1f2937", // Dark text
+                border: "1px solid #e5e7eb", // Subtle border
+                padding: "16px 40px", // Adjusted padding
+                fontSize: "18px",
+                fontWeight: "600", // Adjusted font weight
+                borderRadius: "9999px", // Fully rounded
+                textTransform: "none", // No uppercase
+                letterSpacing: "normal", // Normal letter spacing
                 cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Subtle shadow
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--foreground)" // Lighter black on hover
-                e.currentTarget.style.color = "var(--background)" // White text on hover
-                e.currentTarget.style.transform = "scale(1.05)"
+                e.currentTarget.style.backgroundColor = "#f3f4f6" // Light gray on hover
+                e.currentTarget.style.transform = "scale(1.02)"
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.15)"
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--primary)"
-                e.currentTarget.style.color = "var(--primary-foreground)"
+                e.currentTarget.style.backgroundColor = "white"
                 e.currentTarget.style.transform = "scale(1)"
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)"
               }}
             >
-              Voir Tout
-            </Button>
+              Explorer Plus
+            </button>
           </Link>
         </div>
       </div>

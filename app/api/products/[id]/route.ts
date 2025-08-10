@@ -8,7 +8,8 @@ const supabase = createClient(
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = params
+    // Corrected: Await params before destructuring
+    const { id } = await params
 
     const { data: product, error: productError } = await supabase
       .from("products")
