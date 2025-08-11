@@ -212,7 +212,7 @@ export function ProductCard({
                 e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.05)"
               }}
             >
-              Voir le produit
+              Acheter
             </button>
           </Link>
           

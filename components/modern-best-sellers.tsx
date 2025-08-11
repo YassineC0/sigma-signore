@@ -149,66 +149,82 @@ export function ModernBestSellers() {
 
         {bestSellers.length > 0 ? (
           <>
-            <div
-              ref={scrollContainerRef}
-              style={{
-                display: "flex",
-                overflowX: "scroll",
-                scrollSnapType: "x mandatory",
-                WebkitOverflowScrolling: "touch",
-                scrollbarWidth: "none", // For Firefox
-                msOverflowStyle: "none", // For IE/Edge
-                paddingBottom: "20px", // Space for dots
-                gap: isMobile ? "24px" : "32px", // Increased gap for mobile
-              }}
-              className="[&::-webkit-scrollbar]:hidden" // For Webkit browsers
-            >
-              {bestSellers.map((product, index) => (
-                <div
-                  key={product.id}
-                  ref={(el) => (itemRefs.current[index] = el)}
-                  data-index={index}
-                  style={{
-                    flex: "0 0 auto",
-                    width: isMobile ? "calc(100vw - 64px)" : "calc(25% - 24px)", // Adjust width for slider
-                    scrollSnapAlign: "start",
-                  }}
-                >
-                  <ProductCard
-                    product={product}
-                    index={index}
-                    isVisible={true} // Always visible in slider
-                    isMobile={isMobile}
-                  />
-                </div>
-              ))}
-            </div>
-            {bestSellers.length > 0 && (
+            {isMobile ? (
+              // Mobile: 2-column grid layout
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "8px",
-                  marginTop: "20px",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "16px",
+                  marginBottom: "32px",
                 }}
               >
-                {bestSellers.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => scrollToItem(index)}
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      borderRadius: "50%",
-                      backgroundColor: activeIndex === index ? "#1f2937" : "#d1d5db",
-                      border: "none",
-                      cursor: "pointer",
-                      transition: "background-color 0.3s ease",
-                    }}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
+                {bestSellers.map((product, index) => (
+                  <div key={product.id}>
+                    <ProductCard product={product} index={index} isVisible={true} isMobile={isMobile} />
+                  </div>
                 ))}
               </div>
+            ) : (
+              // Desktop: Keep the existing horizontal slider
+              <>
+                <div
+                  ref={scrollContainerRef}
+                  style={{
+                    display: "flex",
+                    overflowX: "scroll",
+                    scrollSnapType: "x mandatory",
+                    WebkitOverflowScrolling: "touch",
+                    scrollbarWidth: "none", // For Firefox
+                    msOverflowStyle: "none", // For IE/Edge
+                    paddingBottom: "20px", // Space for dots
+                    gap: "32px",
+                  }}
+                  className="[&::-webkit-scrollbar]:hidden" // For Webkit browsers
+                >
+                  {bestSellers.map((product, index) => (
+                    <div
+                      key={product.id}
+                      ref={(el) => (itemRefs.current[index] = el)}
+                      data-index={index}
+                      style={{
+                        flex: "0 0 auto",
+                        width: "calc(25% - 24px)",
+                        scrollSnapAlign: "start",
+                      }}
+                    >
+                      <ProductCard product={product} index={index} isVisible={true} isMobile={isMobile} />
+                    </div>
+                  ))}
+                </div>
+                {bestSellers.length > 0 && !isMobile && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "8px",
+                      marginTop: "20px",
+                    }}
+                  >
+                    {bestSellers.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => scrollToItem(index)}
+                        style={{
+                          width: "10px",
+                          height: "10px",
+                          borderRadius: "50%",
+                          backgroundColor: activeIndex === index ? "#1f2937" : "#d1d5db",
+                          border: "none",
+                          cursor: "pointer",
+                          transition: "background-color 0.3s ease",
+                        }}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </>
         ) : (
