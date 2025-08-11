@@ -79,8 +79,8 @@ export function ModernContact() {
                     Adresse
                   </h4>
                   <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: "1.5" }}>
-                    123 Rue Mohammed V<br />
-                    Meknes, Maroc
+                    TEST<br />
+                    
                   </p>
                 </div>
               </div>
