@@ -36,7 +36,7 @@ export default function CheckoutPage() {
     message += "👤 *Informations Client:*\n"
     message += `Nom: ${customerInfo.name}\n`
     message += `Téléphone: ${customerInfo.phone}\n`
-    if (customerInfo.email) message += `Email: ${customerInfo.email}\n`
+    
     message += `Ville: ${customerInfo.city}\n`
     message += `Adresse: ${customerInfo.address}\n\n`
 
@@ -496,35 +496,7 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    color: "#374151",
-                    marginBottom: "6px",
-                  }}
-                >
-                  <Mail size={16} style={{ display: "inline", marginRight: "6px" }} />
-                  Email (optionnel)
-                </label>
-                <input
-                  type="email"
-                  value={customerInfo.email}
-                  onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                  placeholder="votre@email.com"
-                />
-              </div>
+              
 
               <div>
                 <label
