@@ -148,7 +148,7 @@ export function useToast() {
     duration?: number
   }>>([])
 
-  const showToast = (message: string, type: "success" | "error" | "warning" | "info" = "info", duration = 4000) => {
+  const showToast = (message: string, type: "success" | "error" | "warning" | "info" = "info", duration = 3000) => {
     const id = Math.random().toString(36).substr(2, 9)
     setToasts(prev => [...prev, { id, message, type, duration }])
   }
