@@ -19,7 +19,7 @@ export function WhatsAppButton() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const whatsappLink = "https://wa.me/212631366613?text=Bonjour,%20je%20suis%20intéressé(e)%20par%20vos%20produits." // Replace with your actual WhatsApp number
+  const whatsappLink = "https://wa.me/212643830086?text=Bonjour,%20je%20suis%20intéressé(e)%20par%20vos%20produits." // Replace with your actual WhatsApp number
 
   return (
     <a

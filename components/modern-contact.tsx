@@ -105,7 +105,7 @@ export function ModernContact() {
                   <h4 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", marginBottom: "4px" }}>
                     Téléphone
                   </h4>
-                  <p style={{ fontSize: "14px", color: "#6b7280" }}>+212 631-366613</p> {/* Updated phone number */}
+                  <p style={{ fontSize: "14px", color: "#6b7280" }}>+212 643830086</p> {/* Updated phone number */}
                 </div>
               </div>
               {/* Hours */}

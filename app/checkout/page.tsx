@@ -72,7 +72,7 @@ export default function CheckoutPage() {
     }
 
     const message = generateWhatsAppMessage()
-    const whatsappUrl = `https://wa.me/212631366613?text=${message}`
+    const whatsappUrl = `https://wa.me/212643830086?text=${message}`
     window.open(whatsappUrl, "_blank")
   }
 

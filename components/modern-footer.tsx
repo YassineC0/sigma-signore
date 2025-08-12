@@ -54,7 +54,7 @@ export function ModernFooter() {
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#ffffff")}
               />
             </a>
-            <a href="https://wa.me/212631366613" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <a href="https://wa.me/212643830086" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
               <Whatsapp
                 size={24}
                 color="#ffffff"
@@ -139,7 +139,7 @@ export function ModernFooter() {
           <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
             
             <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: "#a0aec0" }}>
-              <Phone size={18} color="#a0aec0" /> +212 631 366613
+              <Phone size={18} color="#a0aec0" /> +212 643830086
             </li>
             
           </ul>
