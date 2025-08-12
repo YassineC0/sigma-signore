@@ -59,30 +59,8 @@ export function ModernContact() {
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               {/* Address */}
               <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
-                <div
-                  style={{
-                    backgroundColor: "#f0f0f0", // Light background for icon container
-                    border: "1px solid #d1d5db", // Subtle border
-                    borderRadius: "50%",
-                    padding: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minWidth: "48px",
-                    height: "48px",
-                  }}
-                >
-                  <MapPin size={20} color="#1f2937" /> {/* Icon color changed to dark */}
-                </div>
-                <div>
-                  <h4 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", marginBottom: "4px" }}>
-                    Adresse
-                  </h4>
-                  <p style={{ fontSize: "14px", color: "#6b7280", lineHeight: "1.5" }}>
-                    TEST<br />
-                    
-                  </p>
-                </div>
+                
+                
               </div>
               {/* Phone */}
               <div style={{ display: "flex", alignItems: "flex-start", gap: "15px" }}>
