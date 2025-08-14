@@ -9,11 +9,12 @@ interface CartItem {
   productId: number
   name: string
   price: number
+  originalPrice: number // Re-added originalPrice for promotional pricing
   imageUrl: string
   quantity: number
   selectedSize?: string | null
   selectedColor?: string | null
-  // Removed originalPrice and isOnPromotion
+  isOnPromotion: boolean // Re-added isOnPromotion for promotional pricing
   // Add other relevant product details if needed for display in cart
 }
 
@@ -25,7 +26,6 @@ interface CartContextType {
   clearCart: () => void
   cartTotal: number
   cartItemCount: number
-  // Removed promotionalSubtotal, promotionalSavings, appliedPromotions
   setIsOpen: (isOpen: boolean) => void
   isOpen: boolean
 }
@@ -63,8 +63,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           updatedItems[existingItemIndex].quantity += 1
           return updatedItems
         } else {
-          // Determine the correct price (no longer considering promotion_price here)
-          const currentPrice = product.price
+          const currentPrice =
+            product.is_on_promotion && product.promotion_price ? product.promotion_price : product.price
 
           // Determine the correct image URL with improved logic
           let imageUrl = "/placeholder.svg"
@@ -93,11 +93,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             productId: product.id,
             name: product.name,
             price: currentPrice,
+            originalPrice: product.price, // Store original price
             imageUrl: imageUrl,
             quantity: 1,
             selectedSize,
             selectedColor,
-            // Removed originalPrice and isOnPromotion
+            isOnPromotion: product.is_on_promotion || false, // Store promotion status
           }
           return [...prevItems, newItem]
         }
@@ -128,10 +129,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
   }, [cartItems])
 
-  // Removed promotionalSubtotal useMemo
-  // Removed promotionalSavings useMemo
-  // Removed appliedPromotions useMemo
-
   const cartItemCount = useMemo(() => {
     return cartItems.reduce((count, item) => count + item.quantity, 0)
   }, [cartItems])
@@ -146,7 +143,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         cartTotal,
         cartItemCount,
-        // Removed promotionalSubtotal, promotionalSavings, appliedPromotions
         setIsOpen,
         isOpen,
       }}

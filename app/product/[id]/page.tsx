@@ -125,6 +125,47 @@ export default function ProductPage() {
     return colorData?.hex || "#cccccc"
   }
 
+  const getUniqueImages = () => {
+    const images = []
+    const mainImages = [product?.image1, product?.image2, product?.image3, product?.image4].filter(Boolean)
+
+    // Add main product images first
+    mainImages.forEach((imageUrl, index) => {
+      if (imageUrl) {
+        images.push({
+          url: imageUrl,
+          alt: `${product?.name} - Vue ${index + 1}`,
+          type: "main",
+          onClick: () => {
+            setMainImage(imageUrl)
+            setSelectedColor("")
+          },
+          isSelected: mainImage === imageUrl && !selectedColor,
+        })
+      }
+    })
+
+    // Add color-specific images only if they're not already in main images
+    availableColors.forEach((color) => {
+      const variantWithImage = variants.find((v) => v.color === color && v.image_url)
+      if (variantWithImage?.image_url && !mainImages.includes(variantWithImage.image_url)) {
+        images.push({
+          url: variantWithImage.image_url,
+          alt: `${product?.name} - ${color}`,
+          type: "color",
+          color: color,
+          onClick: () => {
+            setMainImage(variantWithImage.image_url)
+            setSelectedColor(color)
+          },
+          isSelected: mainImage === variantWithImage.image_url && selectedColor === color,
+        })
+      }
+    })
+
+    return images
+  }
+
   if (loading) {
     return (
       <div
@@ -244,12 +285,10 @@ export default function ProductPage() {
             />
           </div>
           <div style={{ display: "flex", gap: "10px", overflowX: "auto", paddingBottom: "5px" }}>
-            {product.image1 && (
+            {getUniqueImages().map((image, index) => (
               <div
-                onClick={() => {
-                  setMainImage(product.image1)
-                  setSelectedColor("")
-                }}
+                key={`${image.type}-${index}`}
+                onClick={image.onClick}
                 style={{
                   position: "relative",
                   flexShrink: 0,
@@ -258,137 +297,28 @@ export default function ProductPage() {
                   overflow: "hidden",
                   borderRadius: "4px",
                   cursor: "pointer",
-                  border:
-                    mainImage === product.image1 && !selectedColor ? "2px solid #1f2937" : "2px solid transparent",
+                  border: image.isSelected ? "2px solid #1f2937" : "2px solid transparent",
                   transition: "border-color 0.3s ease",
                 }}
               >
-                <Image
-                  src={product.image1 || "/placeholder.svg"}
-                  alt={`${product.name} - Vue 1`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            )}
-            {product.image2 && (
-              <div
-                onClick={() => {
-                  setMainImage(product.image2)
-                  setSelectedColor("")
-                }}
-                style={{
-                  position: "relative",
-                  flexShrink: 0,
-                  width: "80px",
-                  height: "80px",
-                  overflow: "hidden",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  border:
-                    mainImage === product.image2 && !selectedColor ? "2px solid #1f2937" : "2px solid transparent",
-                  transition: "border-color 0.3s ease",
-                }}
-              >
-                <Image
-                  src={product.image2 || "/placeholder.svg"}
-                  alt={`${product.name} - Vue 2`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            )}
-            {product.image3 && (
-              <div
-                onClick={() => {
-                  setMainImage(product.image3)
-                  setSelectedColor("")
-                }}
-                style={{
-                  position: "relative",
-                  flexShrink: 0,
-                  width: "80px",
-                  height: "80px",
-                  overflow: "hidden",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  border:
-                    mainImage === product.image3 && !selectedColor ? "2px solid #1f2937" : "2px solid transparent",
-                  transition: "border-color 0.3s ease",
-                }}
-              >
-                <Image
-                  src={product.image3 || "/placeholder.svg"}
-                  alt={`${product.name} - Vue 3`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            )}
-            {product.image4 && (
-              <div
-                onClick={() => {
-                  setMainImage(product.image4)
-                  setSelectedColor("")
-                }}
-                style={{
-                  position: "relative",
-                  flexShrink: 0,
-                  width: "80px",
-                  height: "80px",
-                  overflow: "hidden",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  border:
-                    mainImage === product.image4 && !selectedColor ? "2px solid #1f2937" : "2px solid transparent",
-                  transition: "border-color 0.3s ease",
-                }}
-              >
-                <Image
-                  src={product.image4 || "/placeholder.svg"}
-                  alt={`${product.name} - Vue 4`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            )}
-            {/* Display color-specific images */}
-            {availableColors.map((color) => {
-              const variantWithImage = variants.find((v) => v.color === color && v.image_url)
-              if (variantWithImage?.image_url) {
-                return (
+                <Image src={image.url || "/placeholder.svg"} alt={image.alt} fill style={{ objectFit: "cover" }} />
+                {image.type === "color" && image.color && (
                   <div
-                    key={`color-${color}`}
-                    onClick={() => {
-                      setMainImage(variantWithImage.image_url)
-                      setSelectedColor(color)
-                    }}
                     style={{
-                      position: "relative",
-                      flexShrink: 0,
-                      width: "80px",
-                      height: "80px",
-                      overflow: "hidden",
-                      borderRadius: "4px",
-                      cursor: "pointer",
+                      position: "absolute",
+                      top: "4px",
+                      right: "4px",
+                      width: "12px",
+                      height: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: getColorHex(image.color),
                       border:
-                        mainImage === variantWithImage.image_url && selectedColor === color
-                          ? "2px solid #1f2937"
-                          : "2px solid transparent",
-                      transition: "border-color 0.3s ease",
+                        getColorHex(image.color) === "#FFFFFF" ? "1px solid #ddd" : "1px solid rgba(255,255,255,0.3)",
                     }}
-                  >
-                    <Image
-                      src={variantWithImage.image_url || "/placeholder.svg"}
-                      alt={`${product.name} - ${color}`}
-                      fill
-                      style={{ objectFit: "cover" }}
-                    />
-                  </div>
-                )
-              }
-              return null
-            })}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -409,19 +339,58 @@ export default function ProductPage() {
 
           {/* Price */}
           <div>
-            <p
-              style={{
-                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
-                fontWeight: "700",
-                color: "#1f2937",
-                margin: 0,
-              }}
-            >
-              {product.price.toFixed(2)} DHS
-            </p>
+            {product.is_on_promotion && product.promotion_price ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <p
+                    style={{
+                      fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)",
+                      fontWeight: "500",
+                      color: "#6b7280",
+                      margin: 0,
+                      textDecoration: "line-through",
+                    }}
+                  >
+                    {product.price.toFixed(2)} DHS
+                  </p>
+                  <span
+                    style={{
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    PROMO
+                  </span>
+                </div>
+                <p
+                  style={{
+                    fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                    fontWeight: "700",
+                    color: "#ef4444",
+                    margin: 0,
+                  }}
+                >
+                  {product.promotion_price.toFixed(2)} DHS
+                </p>
+              </div>
+            ) : (
+              <p
+                style={{
+                  fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                  fontWeight: "700",
+                  color: "#1f2937",
+                  margin: 0,
+                }}
+              >
+                {product.price.toFixed(2)} DHS
+              </p>
+            )}
           </div>
-
-          {/* Promotion Indicator removed */}
 
           {/* Rating */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

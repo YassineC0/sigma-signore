@@ -36,7 +36,7 @@ export default function CheckoutPage() {
     message += "👤 *Informations Client:*\n"
     message += `Nom: ${customerInfo.name}\n`
     message += `Téléphone: ${customerInfo.phone}\n`
-    
+    if (customerInfo.email) message += `Email: ${customerInfo.email}\n`
     message += `Ville: ${customerInfo.city}\n`
     message += `Adresse: ${customerInfo.address}\n\n`
 
@@ -46,7 +46,12 @@ export default function CheckoutPage() {
       if (item.selectedColor) message += `   Couleur: ${item.selectedColor}\n`
       if (item.selectedSize) message += `   Taille: ${item.selectedSize}\n`
       message += `   Quantité: ${item.quantity}\n`
-      message += `   Prix unitaire: ${item.price.toFixed(2)} DHS\n\n`
+      if (item.isOnPromotion) {
+        message += `   Prix original: ${item.originalPrice.toFixed(2)} DHS (barré)\n`
+        message += `   Prix promotionnel: ${item.price.toFixed(2)} DHS\n\n`
+      } else {
+        message += `   Prix unitaire: ${item.price.toFixed(2)} DHS\n\n`
+      }
     })
 
     message += "💰 *Récapitulatif:*\n"
@@ -206,6 +211,21 @@ export default function CheckoutPage() {
                           }}
                         >
                           {item.name}
+                          {item.isOnPromotion && (
+                            <span
+                              style={{
+                                backgroundColor: "#ef4444",
+                                color: "white",
+                                fontSize: "8px",
+                                fontWeight: "700",
+                                padding: "2px 4px",
+                                borderRadius: "3px",
+                                marginLeft: "6px",
+                              }}
+                            >
+                              PROMO
+                            </span>
+                          )}
                         </h3>
                         <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "6px" }}>
                           {item.selectedColor && <span>Couleur: {item.selectedColor}</span>}
@@ -213,6 +233,17 @@ export default function CheckoutPage() {
                           {item.selectedSize && <span>Taille: {item.selectedSize}</span>}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          {item.isOnPromotion && (
+                            <span
+                              style={{
+                                fontSize: "12px",
+                                color: "#6b7280",
+                                textDecoration: "line-through",
+                              }}
+                            >
+                              {item.originalPrice.toFixed(2)} DHS
+                            </span>
+                          )}
                           <p style={{ fontSize: "14px", fontWeight: "700", color: "#2A555A", margin: 0 }}>
                             {item.price.toFixed(2)} DHS
                           </p>
@@ -321,6 +352,21 @@ export default function CheckoutPage() {
                         }}
                       >
                         {item.name}
+                        {item.isOnPromotion && (
+                          <span
+                            style={{
+                              backgroundColor: "#ef4444",
+                              color: "white",
+                              fontSize: "10px",
+                              fontWeight: "700",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              marginLeft: "8px",
+                            }}
+                          >
+                            PROMO
+                          </span>
+                        )}
                       </h3>
                       <div style={{ fontSize: "14px", color: "#6b7280", marginBottom: "8px" }}>
                         {item.selectedColor && <span>Couleur: {item.selectedColor}</span>}
@@ -328,6 +374,17 @@ export default function CheckoutPage() {
                         {item.selectedSize && <span>Taille: {item.selectedSize}</span>}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {item.isOnPromotion && (
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: "#6b7280",
+                              textDecoration: "line-through",
+                            }}
+                          >
+                            {item.originalPrice.toFixed(2)} DHS
+                          </span>
+                        )}
                         <p style={{ fontSize: "16px", fontWeight: "700", color: "#2A555A", margin: 0 }}>
                           {item.price.toFixed(2)} DHS
                         </p>
@@ -496,7 +553,35 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    color: "#374151",
+                    marginBottom: "6px",
+                  }}
+                >
+                  <Mail size={16} style={{ display: "inline", marginRight: "6px" }} />
+                  Email (optionnel)
+                </label>
+                <input
+                  type="email"
+                  value={customerInfo.email}
+                  onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                  placeholder="votre@email.com"
+                />
+              </div>
 
               <div>
                 <label
